@@ -6,6 +6,7 @@
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 
+# Formula
 # y = Wx + b
 
 # Training data, given x_train as inputs, we expect y_train as outputs
