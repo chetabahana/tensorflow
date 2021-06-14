@@ -14,7 +14,7 @@ print("System path: ", os.environ.get('PATH'))
 
 import tensorflow as tf
 import tensorflow.compat.v1 as v1
-import tensorflow_datasets as tfds
+v1.disable_v2_behavior()
 
 print("\nNum GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
 print("Tensorflow version: ", tf.__version__)
@@ -26,8 +26,6 @@ print("Tensorflow version: ", tf.__version__)
 # TensorFlow 2.0
 #outputs = f(input)
 
-import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
 # Training data, given x_train as inputs, we expect y_train as outputs
 x_train = [1.0, 2.0, 3.0, 4.0]
 y_train = [-1.0, -2.0, -3.0, -4.0]
@@ -45,13 +43,13 @@ y_input = v1.placeholder(dtype=tf.float32)
 y_output = W * x + b
 
 # Loss function and optimizer aim to minimize the difference between actual and expected outputs (total sums)
-loss = tf.reduce_sum(input_tensor=tf.square(x=y_output - y_input))
-optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.01)
+loss = v1.reduce_sum(input_tensor=v1.square(x=y_output - y_input))
+optimizer = v1.train.GradientDescentOptimizer(learning_rate=0.01)
 train_step = optimizer.minimize(loss=loss)
 
 # Sessions are used to evaluate the tensor value of a node or nodes
-session = tf.Session()
-session.run(tf.global_variables_initializer())
+session = v1.Session()
+session.run(v1.global_variables_initializer())
 
 # Total loss before training
 print("\nTotal kerugian sebelum training:", session.run(fetches=loss, feed_dict={x: x_train, y_input: y_train}))
