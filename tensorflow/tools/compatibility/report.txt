@@ -1,0 +1,22 @@
+TensorFlow 2.0 Upgrade Script
+-----------------------------
+Converted 1 files
+Detected 0 issues that require attention
+--------------------------------------------------------------------------------
+================================================================================
+Detailed log follows:
+
+================================================================================
+--------------------------------------------------------------------------------
+Processing file 'main_v1.py'
+ outputting to 'main_v2.py'
+--------------------------------------------------------------------------------
+
+16:0: INFO: Renamed 'tf.disable_v2_behavior' to 'tf.compat.v1.disable_v2_behavior'
+34:4: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+35:10: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+42:12: INFO: Renamed 'tf.train.GradientDescentOptimizer' to 'tf.compat.v1.train.GradientDescentOptimizer'
+46:10: INFO: Renamed 'tf.Session' to 'tf.compat.v1.Session'
+47:12: INFO: Renamed 'tf.global_variables_initializer' to 'tf.compat.v1.global_variables_initializer'
+--------------------------------------------------------------------------------
+
