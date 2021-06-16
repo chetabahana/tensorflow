@@ -12,8 +12,8 @@ print("System path: ", os.environ.get('PATH'))
 #Migrate your TensorFlow 1 code to TensorFlow 2
 #https://www.tensorflow.org/guide/migrate
 
-import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
+import tensorflow as tf
+tf.compat.v1.disable_v2_behavior()
 
 print("\nNum GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
 print("Tensorflow version: ", tf.__version__)
@@ -31,20 +31,20 @@ W = tf.Variable(initial_value=[1.0], dtype=tf.float32)
 b = tf.Variable(initial_value=[1.0], dtype=tf.float32)
 
 # x is an input placeholder and y is a placeholder used to tell model what correct answers are
-x = tf.placeholder(dtype=tf.float32)
-y_input = tf.placeholder(dtype=tf.float32)
+x = tf.compat.v1.placeholder(dtype=tf.float32)
+y_input = tf.compat.v1.placeholder(dtype=tf.float32)
 
 # y_output is the formula we are trying to follow to produce an output given input from x
 y_output = W * x + b
 
 # Loss function and optimizer aim to minimize the difference between actual and expected outputs (total sums)
 loss = tf.reduce_sum(input_tensor=tf.square(x=y_output - y_input))
-optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.01)
+optimizer = tf.compat.v1.train.GradientDescentOptimizer(learning_rate=0.01)
 train_step = optimizer.minimize(loss=loss)
 
 # Sessions are used to evaluate the tensor value of a node or nodes
-session = tf.Session()
-session.run(tf.global_variables_initializer())
+session = tf.compat.v1.Session()
+session.run(tf.compat.v1.global_variables_initializer())
 
 # Total loss before training
 print("\nTotal kerugian sebelum training:", session.run(fetches=loss, feed_dict={x: x_train, y_input: y_train}))
