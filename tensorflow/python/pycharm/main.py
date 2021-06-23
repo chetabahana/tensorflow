@@ -1,4 +1,5 @@
-#Import
+'''  Test The Model Accuracy on Existing Data  '''
+
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -46,8 +47,6 @@ model.add(Dense(units=1)) #Prediction of the next closing value
 
 model.compile(optimizer='adam', loss='mean_squared_error')
 model.fit(x_train, y_train, epochs=25, batch_size=32)
-
-'''  Test The Model Accuracy on Existing Data  '''
 
 #Load Test Data
 test_start = dt.datetime(2012,1,1)
