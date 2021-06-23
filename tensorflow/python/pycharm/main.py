@@ -1,60 +1,94 @@
-# This is a sample of Python script.
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import pandas_datareader as web
+import datetime as dt
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from sklearn.preprocessing import MinMaxScaler
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, LSTM
 
-import os, sys, platform
-print("\nPlatform:", platform.platform())
-print("Python version: ", sys.version)
-os.system('pip --version')
-print("System path: ", os.environ.get('PATH'))
+#Load Data
+company = 'FB'
 
-#Migrate your TensorFlow 1 code to TensorFlow 2
-#https://www.tensorflow.org/guide/migrate
+start = dt.datetime(2012,1,1)
+end = dt.datetime(2020,1,1)
 
-import tensorflow as tf
-#import tensorflow.compat.v1 as tf
-#tf.disable_v2_behavior()
+data = web.DataReader(company, 'yahoo', start, end)
 
-print("\nNum GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
-print("Tensorflow version: ", tf.__version__, "\n")
+#Prepare Data
+scaler = MinMaxScaler(feature_range=(0,1))
+scaled_data = scaler.fit_transform(data['Close'].values.reshape(-1,1))
 
-# Formula
-# y = Wx + b
+prediction_days = 60
 
-# Training data, given x_train as inputs, we expect y_train as outputs
-#x_train = [1.0, 2.0, 3.0, 4.0]
-#y_train = [-1.0, -2.0, -3.0, -4.0]
+x_train = []
+y_train = []
 
-x_train = tf.constant([1.0, 2.0, 3.0, 4.0])
-y_train = tf.constant([-1.0, -2.0, -3.0, -4.0])
+for x in range(prediction_days, len(scaled_data)):
+    x_train.append(scaled_data[x-prediction_days:x,0])
+    y_train.append(scaled_data[x, 0])
 
-print("x_train = ", x_train)
-print("y_train = ", y_train, "\n")
+x_train, y_train = np.array(x_train), np.array(y_train)
+x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
-# Graph construction
-# W and b are variables that our model will change
-#W = tf.Variable(initial_value=[1.0], dtype=tf.float32)
-#b = tf.Variable(initial_value=[1.0], dtype=tf.float32)
-W = tf.Variable(tf.zeros(shape=(1,)), name="W")
-b = tf.Variable(tf.ones(shape=(1,)), name="b")
+#Build The Model
+model = Sequential()
 
-print("W = ", W)
-print("b = ", b, "\n")
+model.add(LSTM(units=50, return_sequences=True, input_shape=(x_train.shape[1], 1)))
+model.add(Dropout(0.2))
+model.add(LSTM(units=50, return_sequences=True))
+model.add(Dropout(0.2))
+model.add(LSTM(units=50))
+model.add(Dropout(0.2))
+model.add(Dense(units=1)) #Prediction of the next closing value
 
-#x is an input placeholder and y is a placeholder used to tell model what correct answers are
-#x = tf.placeholder(dtype=tf.float32)
-#print("x = ", x)
-#y_input = tf.placeholder(dtype=tf.float32)
-#print("y_input = ", y_input, "\n")
+model.compile(optimizer='adam', loss='mean_squared_error')
+model.fit(x_train, y_train, epochs=25, batch_size=32)
 
-# y_output is the formula we are trying to follow to produce an output given input from x
-#y_output = W * x + b
+'''  Test The Model Accuracy on Existing Data  '''
 
-@tf.function
-def forward(x):
-  return W * x + b
+#Load Test Data
+test_start = dt.datetime(2012,1,1)
+test_end = dt.datetime.now()
 
-y_output = forward(x_train)
-print("y_output = ", y_output)
+test_data = web.DataReader(company, 'yahoo', test_start, test_end)
+actual_prices = test_data['Close'].values
 
+total_dataset = pd.concat((data['Close'], test_data['Close']), axis=0)
+
+#model_inputs=total_dataset[len(total_dataset)-len(test_data)-prediction_days:].values
+model_inputs = total_dataset[len(total_dataset) - len(test_data) - prediction_days:].values
+model_inputs = model_inputs.reshape(-1, 1)
+model_inputs = scaler.transform(model_inputs)
+
+#Make Prediction on Test Data
+
+x_test = []
+
+for x in range(prediction_days, len(model_inputs)):
+    x_test.append(model_inputs[x-prediction_days:x, 0])
+
+x_test = np.array(x_test)
+x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
+
+predicted_prices = model.predict(x_test)
+predicted_prices = scaler.inverse_transform(predicted_prices)
+
+# Plot The Test Predictions
+plt.plot(actual_prices, color="black", label=f"Actual {company} Price")
+plt.plot(predicted_prices, color="green", label=f"Predicted {company} Price")
+plt.title(f"{company} Share Price")
+plt.xlabel('Time')
+plt.ylabel(f"{company} Share Price")
+plt.legend()
+plt.show()
+
+# Predict Next Day
+real_data = [model_inputs[len(model_inputs) + 1 - prediction_days:len(model_inputs+1), 0]]
+real_data = np.array(real_data)
+real_data = np.reshape(real_data, (real_data.shape[0], real_data.shape[1],1))
+
+prediction = model.predict(real_data)
+prediction = scaler.inverse_transform(prediction)
+print(f"Prediction: {prediction}")
