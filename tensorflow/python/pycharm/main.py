@@ -10,3 +10,16 @@ from keras.models import Sequential
 from keras.layers import Dense, LSTM
 import matplotlib.pyplot as plt
 plt.style.use('fivethirtyeight')
+
+# Get the stock quote
+df = web.DataReader('AAPL', data_source='yahoo', start='2012-01-01', end='2019-12-17')
+# Show the data
+print(df)
+
+# Visualize the closing price history
+plt.plot(figsize=(16,8))
+plt.title('Close Price History')
+plt.plot(df['Close'])
+plt.xlabel('Data', fontsize=18)
+plt.ylabel('Close Price USD($)', fontsize=18)
+plt.show() 
