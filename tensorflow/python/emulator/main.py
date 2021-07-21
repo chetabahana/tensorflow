@@ -20,6 +20,7 @@ import pandas as pd
 df = pd.DataFrame({"path":full_path,'file_name':file_name,"tag":tag})
 df.groupby(['tag']).size()
 
+<<<<<<< HEAD
 #tag
 #daisy        1538
 #dandelion    2110
@@ -27,10 +28,20 @@ df.groupby(['tag']).size()
 #sunflower    1468
 #tulip        1968
 #dtype: int64
+=======
+tag
+daisy        1538
+dandelion    2110
+rose         1568
+sunflower    1468
+tulip        1968
+dtype: int64
+>>>>>>> Chetabahana
 
 #cek sample datanya
 print(df.head())
 
+<<<<<<< HEAD
 #load library untuk train test split
 from sklearn.model_selection import train_test_split
 
@@ -74,3 +85,5 @@ print('===================================================== \n')
 
 #cek sample datanya
 df_all.sample(3)
+=======
+>>>>>>> Chetabahana
