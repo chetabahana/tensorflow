@@ -74,3 +74,33 @@ print('===================================================== \n')
 
 #cek sample datanya
 df_all.sample(3)
+
+# menghapus folder dataset jika diperlukan
+#!rm -rf dataset/
+
+import shutil
+from tqdm.notebook import tqdm as tq
+
+datasource_path = "flowers/"
+dataset_path = "dataset/"
+
+
+for index, row in tq(df_all.iterrows()):
+    
+    #detect filepath
+    file_path = row['path']
+    if os.path.exists(file_path) == False:
+            file_path = os.path.join(datasource_path,row['tag'],row['image'].split('.')[0])            
+    
+    #make folder destination dirs
+    if os.path.exists(os.path.join(dataset_path,row['set'],row['tag'])) == False:
+        os.makedirs(os.path.join(dataset_path,row['set'],row['tag']))
+    
+    #define file dest
+    destination_file_name = file_path.split('/')[-1]
+    file_dest = os.path.join(dataset_path,row['set'],row['tag'],destination_file_name)
+    
+    #copy file from source to dest
+    if os.path.exists(file_dest) == False:
+        shutil.copy2(file_path,file_dest)
+HBox(children=(FloatProgress(value=1.0, bar_style='info', max=1.0), HTML(value='')))
