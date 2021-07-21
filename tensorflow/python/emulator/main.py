@@ -20,14 +20,57 @@ import pandas as pd
 df = pd.DataFrame({"path":full_path,'file_name':file_name,"tag":tag})
 df.groupby(['tag']).size()
 
-tag
-daisy        1538
-dandelion    2110
-rose         1568
-sunflower    1468
-tulip        1968
-dtype: int64
+#tag
+#daisy        1538
+#dandelion    2110
+#rose         1568
+#sunflower    1468
+#tulip        1968
+#dtype: int64
 
 #cek sample datanya
 print(df.head())
 
+#load library untuk train test split
+from sklearn.model_selection import train_test_split
+
+#variabel yang digunakan pada pemisahan data ini
+X= df['path']
+y= df['tag']
+
+# split dataset awal menjadi data train dan test
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.20, random_state=300)
+
+# kemudian data test dibagi menjadi 2 sehingga menjadi data test dan data validation.
+X_test, X_val, y_test, y_val = train_test_split(
+    X_test, y_test, test_size=0.5, random_state=100)
+
+# menyatukan kedalam masing-masing dataframe
+
+df_tr = pd.DataFrame({'path':X_train
+              ,'tag':y_train
+             ,'set':'train'})
+
+df_te = pd.DataFrame({'path':X_test
+              ,'tag':y_test
+             ,'set':'test'})
+
+df_val = pd.DataFrame({'path':X_val
+              ,'tag':y_val
+             ,'set':'validation'})
+
+print('train size', len(df_tr))
+print('val size', len(df_te))
+print('test size', len(df_val))
+
+# melihat proporsi pada masing masing set apakah sudah ok atau masih ada yang ingin diubah
+df_all = df_tr.append([df_te,df_val]).reset_index(drop=1)\
+
+print('===================================================== \n')
+print(df_all.groupby(['set','tag']).size(),'\n')
+
+print('===================================================== \n')
+
+#cek sample datanya
+df_all.sample(3)
