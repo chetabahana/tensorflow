@@ -79,11 +79,11 @@ df_all.sample(3)
 #!rm -rf dataset/
 
 import shutil
+from ipywidgets import HBox
 from tqdm.notebook import tqdm as tq
 
 datasource_path = "flowers/"
 dataset_path = "dataset/"
-
 
 for index, row in tq(df_all.iterrows()):
     
@@ -97,10 +97,12 @@ for index, row in tq(df_all.iterrows()):
         os.makedirs(os.path.join(dataset_path,row['set'],row['tag']))
     
     #define file dest
-    destination_file_name = file_path.split('/')[-1]
+    destination_file_name = file_path.split('\\')[-1]
     file_dest = os.path.join(dataset_path,row['set'],row['tag'],destination_file_name)
     
     #copy file from source to dest
     if os.path.exists(file_dest) == False:
+        print(file_path,'►',file_dest)
         shutil.copy2(file_path,file_dest)
+
 HBox(children=(FloatProgress(value=1.0, bar_style='info', max=1.0), HTML(value='')))
